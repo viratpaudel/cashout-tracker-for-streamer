@@ -53,11 +53,12 @@
     .logo-text { font-size:18px; font-weight:800; letter-spacing:-0.4px; }
     .logo-text em { color:var(--c-gold); font-style:normal; }
     .logo-sub { font-size:11px; color:var(--c-muted); font-weight:400; margin-top:1px; }
-    .header-right { display:flex; align-items:center; gap:8px; }
+    .header-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .pill { border-radius:999px; padding:6px 14px; font-family:'DM Mono',monospace; font-size:13px; font-weight:500; white-space:nowrap; }
     .pill-gold { background:rgba(245,200,66,0.1); border:1px solid rgba(245,200,66,0.25); color:var(--c-gold); }
     .pill-ghost { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); color:var(--c-muted); cursor:pointer; font-family:'Syne',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.5px; transition:all 0.15s; }
     .pill-ghost:hover { color:var(--c-text); border-color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); }
+    .pill-ghost.active { color:var(--c-gold); border-color:rgba(245,200,66,0.3); background:rgba(245,200,66,0.07); }
     .stats-row { display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--c-border2); }
     .stat-card { padding:18px 22px; border-right:1px solid var(--c-border2); }
     .stat-card:last-child { border-right:none; }
@@ -89,6 +90,23 @@
     .add-btn:hover { opacity:0.88; box-shadow:0 4px 28px rgba(245,200,66,0.35); }
     .add-btn:active { transform:scale(0.97); }
     .add-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+ 
+    /* CHART */
+    .chart-section { padding:20px 28px 4px; border-bottom:1px solid var(--c-border2); display:none; }
+    .section-label { font-size:10px; text-transform:uppercase; letter-spacing:1.4px; color:var(--c-muted); font-weight:700; margin-bottom:14px; }
+ 
+    /* MONTHLY */
+    .monthly-section { border-top:1px solid var(--c-border2); display:none; }
+    .monthly-header { padding:16px 28px 0; display:flex; align-items:center; justify-content:space-between; }
+    .monthly-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:10px; padding:14px 28px 20px; }
+    .month-card { background:var(--c-surface2); border:1px solid var(--c-border2); border-radius:12px; padding:14px 16px; transition:border-color 0.15s; }
+    .month-card:hover { border-color:rgba(245,200,66,0.2); }
+    .month-name { font-size:11px; font-weight:700; color:var(--c-text); margin-bottom:10px; }
+    .month-net { font-family:'DM Mono',monospace; font-size:18px; font-weight:500; margin-bottom:6px; }
+    .month-meta { font-size:11px; color:var(--c-muted); }
+    .toggle-btn { font-size:11px; font-family:'Syne',sans-serif; font-weight:700; color:var(--c-muted); background:none; border:none; cursor:pointer; padding:3px 6px; border-radius:5px; transition:color 0.15s; }
+    .toggle-btn:hover { color:var(--c-text); }
+ 
     .table-wrap { max-height:380px; overflow-y:auto; }
     .table-wrap::-webkit-scrollbar { width:4px; }
     .table-wrap::-webkit-scrollbar-thumb { background:rgba(245,200,66,0.18); border-radius:4px; }
@@ -132,13 +150,14 @@
       .form-section { grid-template-columns:1fr 1fr; }
       .add-btn { grid-column:1/-1; }
       .header { flex-direction:column; align-items:flex-start; gap:12px; }
+      .monthly-grid { grid-template-columns:1fr 1fr; }
     }
   </style>
 </head>
 <body>
-
+ 
   <p class="page-title">Stream Sessions</p>
-
+ 
   <div class="tracker">
     <div class="header">
       <div class="logo-area">
@@ -149,11 +168,13 @@
         </div>
       </div>
       <div class="header-right">
-        <button class="pill pill-ghost" onclick="exportCSV()">↓ Export CSV</button>
+        <button class="pill pill-ghost" id="btn-chart" onclick="toggleChart()" style="display:none;">📈 Chart</button>
+        <button class="pill pill-ghost" id="btn-monthly" onclick="toggleMonthly()" style="display:none;">📅 Monthly</button>
+        <button class="pill pill-ghost" onclick="exportCSV()">↓ CSV</button>
         <div class="pill pill-gold" id="total-pill">Net $0.00</div>
       </div>
     </div>
-
+ 
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-label">Streams</div>
@@ -172,7 +193,7 @@
         <div class="stat-val" id="s-net" style="color:var(--c-gold)">$0.00</div>
       </div>
     </div>
-
+ 
     <div class="form-section">
       <div class="field">
         <label>Date</label>
@@ -188,7 +209,14 @@
       </div>
       <button class="add-btn" id="add-btn" onclick="addEntry()">+ Add</button>
     </div>
-
+ 
+    <!-- CHART SECTION -->
+    <div class="chart-section" id="chart-section">
+      <div class="section-label">Cashout Over Time</div>
+      <canvas id="cashout-chart" height="110" style="width:100%;display:block;"></canvas>
+      <div style="height:16px;"></div>
+    </div>
+ 
     <div class="table-wrap">
       <table>
         <thead>
@@ -205,16 +233,25 @@
         </tbody>
       </table>
     </div>
-
+ 
+    <!-- MONTHLY SECTION -->
+    <div class="monthly-section" id="monthly-section">
+      <div class="monthly-header">
+        <div class="section-label" style="margin-bottom:0;">Monthly Summary</div>
+        <button class="toggle-btn" id="monthly-toggle-btn" onclick="toggleMonthly()">▲ Hide</button>
+      </div>
+      <div class="monthly-grid" id="monthly-grid"></div>
+    </div>
+ 
     <div class="footer">
       <div class="save-ind" id="save-ind">Connecting…</div>
       <button class="clear-btn" onclick="clearAll()">Clear all</button>
     </div>
   </div>
-
+ 
   <script>
-    const SUPABASE_URL = 'https://usqwlllhmucejzsyoihd.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_lLwWAQs_IaJxlYwz3lTlkw_WGyXFq4a';
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
     const API = SUPABASE_URL + '/rest/v1/streams';
     const H = {
       'apikey': SUPABASE_KEY,
@@ -222,9 +259,11 @@
       'Content-Type': 'application/json',
       'Prefer': 'return=representation'
     };
-
+ 
     let entries = [];
-
+    let chartVisible = false;
+    let monthlyVisible = false;
+ 
     async function load() {
       try {
         const r = await fetch(API + '?order=date.desc,created_at.desc', { headers: H });
@@ -238,7 +277,7 @@
           `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not connect to database.</p></div></td></tr>`;
       }
     }
-
+ 
     async function addEntry() {
       const date = document.getElementById('f-date').value;
       const nEl  = document.getElementById('f-name');
@@ -246,15 +285,15 @@
       const name = nEl.value.trim();
       const cashout = parseFloat(cEl.value);
       const btn  = document.getElementById('add-btn');
-
+ 
       nEl.classList.remove('error'); cEl.classList.remove('error');
       if (!name)          { nEl.classList.add('error'); }
       if (isNaN(cashout)) { cEl.classList.add('error'); }
       if (!name || isNaN(cashout)) return;
-
+ 
       btn.disabled = true; btn.textContent = '…';
       status('Saving…');
-
+ 
       try {
         const r = await fetch(API, { method:'POST', headers:H, body:JSON.stringify({date,name,cashout}) });
         if (!r.ok) throw new Error(await r.text());
@@ -270,7 +309,7 @@
         btn.disabled = false; btn.textContent = '+ Add';
       }
     }
-
+ 
     async function removeEntry(id) {
       const prev = [...entries];
       entries = entries.filter(e => e.id !== id);
@@ -284,7 +323,7 @@
         status('⚠ Delete failed', true);
       }
     }
-
+ 
     async function clearAll() {
       if (!entries.length) return;
       if (!confirm('Delete all ' + entries.length + ' session(s)? Cannot be undone.')) return;
@@ -296,7 +335,7 @@
         status('All sessions cleared');
       } catch(e) { status('⚠ Clear failed', true); }
     }
-
+ 
     function status(msg, isErr, autoReset) {
       const el = document.getElementById('save-ind');
       el.textContent = msg;
@@ -306,7 +345,7 @@
         el.textContent = entries.length + ' session' + (entries.length !== 1 ? 's' : '') + ' stored';
       }, 2500);
     }
-
+ 
     function fmt(n) { return (n >= 0 ? '+$' : '-$') + Math.abs(n).toFixed(2); }
     function fmtDate(d) {
       const [y,m,day] = d.split('-');
@@ -316,27 +355,126 @@
     function esc(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
-
+ 
+    // ── CHART ──────────────────────────────────────────────
+    function toggleChart() {
+      chartVisible = !chartVisible;
+      const sec = document.getElementById('chart-section');
+      const btn = document.getElementById('btn-chart');
+      sec.style.display = chartVisible ? 'block' : 'none';
+      btn.classList.toggle('active', chartVisible);
+      if (chartVisible) renderChart();
+    }
+ 
+    function renderChart() {
+      if (!chartVisible || entries.length < 2) return;
+      const sorted = [...entries].sort((a,b) => a.date.localeCompare(b.date));
+      const labels = sorted.map(e => {
+        const [,m,d] = e.date.split('-');
+        return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1] + ' ' + parseInt(d);
+      });
+      const data = sorted.map(e => parseFloat(e.cashout));
+      const canvas = document.getElementById('cashout-chart');
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width  = canvas.offsetWidth * dpr;
+      canvas.height = 110 * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      const W = canvas.offsetWidth, H = 110;
+      ctx.clearRect(0,0,W,H);
+      const min = Math.min(...data), max = Math.max(...data), range = max - min || 1;
+      const pad = {t:12,b:26,l:10,r:10};
+      const pts = data.map((v,i) => ({
+        x: pad.l + (i/(data.length-1))*(W-pad.l-pad.r),
+        y: pad.t + (1-(v-min)/range)*(H-pad.t-pad.b)
+      }));
+      // zero line
+      if (min < 0 && max > 0) {
+        const zy = pad.t + (1-(0-min)/range)*(H-pad.t-pad.b);
+        ctx.save(); ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(pad.l,zy); ctx.lineTo(W-pad.r,zy); ctx.stroke(); ctx.restore();
+      }
+      // gradient fill
+      const grad = ctx.createLinearGradient(0,pad.t,0,H);
+      grad.addColorStop(0,'rgba(245,200,66,0.15)'); grad.addColorStop(1,'rgba(245,200,66,0)');
+      ctx.beginPath(); ctx.moveTo(pts[0].x,H-pad.b);
+      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.lineTo(pts[pts.length-1].x,H-pad.b); ctx.closePath();
+      ctx.fillStyle=grad; ctx.fill();
+      // line
+      ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
+      pts.forEach(p=>ctx.lineTo(p.x,p.y));
+      ctx.strokeStyle='#F5C842'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
+      // dots + x-labels
+      ctx.font = `${9*dpr/dpr}px 'DM Mono',monospace`; ctx.textAlign='center';
+      pts.forEach((p,i)=>{
+        ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2);
+        ctx.fillStyle = data[i]>=0?'#3DDB82':'#FF4D4D'; ctx.fill();
+        ctx.fillStyle='#7A7870'; ctx.fillText(labels[i],p.x,H-8);
+      });
+    }
+ 
+    // ── MONTHLY ────────────────────────────────────────────
+    function toggleMonthly() {
+      monthlyVisible = !monthlyVisible;
+      const sec = document.getElementById('monthly-section');
+      const btn = document.getElementById('btn-monthly');
+      const tbtn = document.getElementById('monthly-toggle-btn');
+      sec.style.display = monthlyVisible ? 'block' : 'none';
+      btn.classList.toggle('active', monthlyVisible);
+      if (tbtn) tbtn.textContent = monthlyVisible ? '▲ Hide' : '▼ Show';
+      if (monthlyVisible) renderMonthly();
+    }
+ 
+    function renderMonthly() {
+      const grid = document.getElementById('monthly-grid');
+      const months = {};
+      entries.forEach(e => {
+        const key = e.date.slice(0,7);
+        if (!months[key]) months[key] = [];
+        months[key].push(parseFloat(e.cashout));
+      });
+      const names = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      grid.innerHTML = Object.keys(months).sort((a,b)=>b.localeCompare(a)).map(key => {
+        const [y,m] = key.split('-');
+        const vals = months[key];
+        const net = vals.reduce((a,b)=>a+b,0);
+        const best = Math.max(...vals);
+        const pos = net >= 0;
+        return `<div class="month-card">
+          <div class="month-name">${names[parseInt(m)-1]} ${y}</div>
+          <div class="month-net" style="color:${pos?'var(--c-green)':'var(--c-red)'}">${fmt(net)}</div>
+          <div class="month-meta">${vals.length} stream${vals.length!==1?'s':''} · best ${fmt(best)}</div>
+        </div>`;
+      }).join('');
+    }
+ 
+    // ── RENDER ─────────────────────────────────────────────
     function render() {
       const vals = entries.map(e => parseFloat(e.cashout));
-      const net  = vals.reduce((a,b) => a+b, 0);
+      const net  = vals.reduce((a,b)=>a+b,0);
       const best = vals.length ? Math.max(...vals) : null;
       const worst = vals.length ? Math.min(...vals) : null;
-
+ 
       document.getElementById('s-count').textContent = entries.length;
       document.getElementById('s-net').textContent   = fmt(net);
-      document.getElementById('s-net').style.color   = net >= 0 ? 'var(--c-green)' : 'var(--c-red)';
-      document.getElementById('s-best').textContent  = best  !== null ? fmt(best)  : '—';
-      document.getElementById('s-worst').textContent = worst !== null ? fmt(worst) : '—';
+      document.getElementById('s-net').style.color   = net>=0?'var(--c-green)':'var(--c-red)';
+      document.getElementById('s-best').textContent  = best  !==null ? fmt(best)  : '—';
+      document.getElementById('s-worst').textContent = worst !==null ? fmt(worst) : '—';
       document.getElementById('total-pill').textContent = 'Net ' + fmt(net);
-
+ 
+      // show/hide feature buttons
+      const hasData = entries.length >= 2;
+      document.getElementById('btn-chart').style.display   = entries.length>=2 ? '' : 'none';
+      document.getElementById('btn-monthly').style.display = entries.length>=1 ? '' : 'none';
+ 
       const body = document.getElementById('entries-body');
       if (!entries.length) {
         body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🎰</div><p>No streams logged yet — add your first session above.</p></div></td></tr>`;
         return;
       }
       body.innerHTML = entries.map(e => {
-        const v = parseFloat(e.cashout), pos = v >= 0;
+        const v = parseFloat(e.cashout), pos = v>=0;
         return `<tr style="animation:rowIn 0.25s ease both">
           <td class="td-date">${fmtDate(e.date)}</td>
           <td class="td-stream"><span class="dot"></span>${esc(e.name)}</td>
@@ -345,18 +483,21 @@
           <td style="text-align:center"><button class="del-btn" onclick="removeEntry('${e.id}')">✕</button></td>
         </tr>`;
       }).join('');
+ 
+      if (chartVisible) renderChart();
+      if (monthlyVisible) renderMonthly();
     }
-
+ 
     function exportCSV() {
       if (!entries.length) return;
       const rows = [['Date','Stream','Cashout','Result'],
-        ...entries.map(e => [e.date, '"'+String(e.name).replace(/"/g,'""')+'"', parseFloat(e.cashout).toFixed(2), parseFloat(e.cashout)>=0?'profit':'loss'])];
-      const blob = new Blob([rows.map(r=>r.join(',')).join('\r\n')], {type:'text/csv;charset=utf-8;'});
-      const a = Object.assign(document.createElement('a'), {href:URL.createObjectURL(blob), download:'chips-gg-'+new Date().toISOString().slice(0,10)+'.csv'});
+        ...entries.map(e=>[e.date,'"'+String(e.name).replace(/"/g,'""')+'"',parseFloat(e.cashout).toFixed(2),parseFloat(e.cashout)>=0?'profit':'loss'])];
+      const blob = new Blob([rows.map(r=>r.join(',')).join('\r\n')],{type:'text/csv;charset=utf-8;'});
+      const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'chips-gg-'+new Date().toISOString().slice(0,10)+'.csv'});
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
-
-    ['f-name','f-cashout'].forEach(id => document.getElementById(id).addEventListener('keydown', e => e.key==='Enter' && addEntry()));
+ 
+    ['f-name','f-cashout'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>e.key==='Enter'&&addEntry()));
     document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
     load();
   </script>
