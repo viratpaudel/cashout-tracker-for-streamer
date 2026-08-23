@@ -18,35 +18,29 @@
         radial-gradient(ellipse 60% 40% at 70% 10%, rgba(245,200,66,0.06) 0%, transparent 70%),
         radial-gradient(ellipse 50% 50% at 10% 80%, rgba(61,219,130,0.04) 0%, transparent 60%),
         var(--c-bg);
-      font-family: 'Syne', sans-serif;
-      color: var(--c-text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 40px 16px 60px;
+      font-family: 'Syne', sans-serif; color: var(--c-text);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start; padding: 40px 16px 60px;
     }
-    .page-title { font-size: 12px; text-transform: uppercase; letter-spacing: 3px; color: var(--c-muted); font-weight: 600; margin-bottom: 20px; opacity: 0.7; }
+    .page-title { font-size:12px; text-transform:uppercase; letter-spacing:3px; color:var(--c-muted); font-weight:600; margin-bottom:20px; opacity:0.7; }
     .tracker {
-      background: var(--c-surface); border-radius: 20px; border: 1px solid var(--c-border);
-      overflow: hidden; width: 100%; max-width: 700px;
-      box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 24px 80px rgba(0,0,0,0.6), 0 0 120px rgba(245,200,66,0.04);
-      animation: fadeUp 0.4s ease both;
+      background:var(--c-surface); border-radius:20px; border:1px solid var(--c-border);
+      overflow:hidden; width:100%; max-width:700px;
+      box-shadow:0 0 0 1px rgba(0,0,0,0.5), 0 24px 80px rgba(0,0,0,0.6), 0 0 120px rgba(245,200,66,0.04);
+      animation:fadeUp 0.4s ease both;
     }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
     .header {
-      background: linear-gradient(135deg, #1c1608 0%, #13140f 50%, #0E0F11 100%);
-      border-bottom: 1px solid var(--c-border);
-      padding: 22px 28px 20px;
-      display: flex; align-items: center; justify-content: space-between;
+      background:linear-gradient(135deg,#1c1608 0%,#13140f 50%,#0E0F11 100%);
+      border-bottom:1px solid var(--c-border); padding:22px 28px 20px;
+      display:flex; align-items:center; justify-content:space-between;
     }
-    .logo-area { display: flex; align-items: center; gap: 12px; }
+    .logo-area { display:flex; align-items:center; gap:12px; }
     .chip-icon {
-      width: 36px; height: 36px; background: var(--c-gold); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      position: relative; overflow: hidden; flex-shrink: 0;
-      box-shadow: 0 0 20px rgba(245,200,66,0.3);
+      width:36px; height:36px; background:var(--c-gold); border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:hidden; flex-shrink:0;
+      box-shadow:0 0 20px rgba(245,200,66,0.3);
     }
     .chip-icon::before { content:''; position:absolute; inset:4px; border-radius:50%; border:2px dashed #0E0F11; }
     .chip-icon span { font-size:14px; z-index:1; }
@@ -66,18 +60,20 @@
     .stat-val { font-family:'DM Mono',monospace; font-size:20px; font-weight:500; line-height:1; }
     .form-section {
       padding:20px 28px; border-bottom:1px solid var(--c-border2);
-      display:grid; grid-template-columns:150px 1fr 140px auto;
+      display:grid; grid-template-columns:130px 1fr 120px auto;
       gap:10px; align-items:end; background:rgba(0,0,0,0.15);
     }
+    .form-notes { padding:0 28px 16px; background:rgba(0,0,0,0.15); border-bottom:1px solid var(--c-border2); }
     .field label { display:block; font-size:10px; text-transform:uppercase; letter-spacing:1.2px; color:var(--c-muted); margin-bottom:7px; font-weight:700; }
-    .field input {
+    .field input, .field textarea {
       width:100%; background:var(--c-surface2); border:1px solid rgba(255,255,255,0.07);
       border-radius:10px; padding:10px 13px; color:var(--c-text);
       font-family:'DM Mono',monospace; font-size:13px; outline:none;
       transition:border-color 0.15s, box-shadow 0.15s;
     }
-    .field input:focus { border-color:rgba(245,200,66,0.35); box-shadow:0 0 0 3px rgba(245,200,66,0.07); }
-    .field input::placeholder { color:var(--c-muted); opacity:0.6; }
+    .field textarea { resize:none; height:60px; line-height:1.5; }
+    .field input:focus, .field textarea:focus { border-color:rgba(245,200,66,0.35); box-shadow:0 0 0 3px rgba(245,200,66,0.07); }
+    .field input::placeholder, .field textarea::placeholder { color:var(--c-muted); opacity:0.6; }
     .field input[type="date"]::-webkit-calendar-picker-indicator { filter:invert(0.4) sepia(1) hue-rotate(5deg); cursor:pointer; }
     .field input.error { border-color:rgba(255,77,77,0.5); }
     .add-btn {
@@ -90,11 +86,9 @@
     .add-btn:hover { opacity:0.88; box-shadow:0 4px 28px rgba(245,200,66,0.35); }
     .add-btn:active { transform:scale(0.97); }
     .add-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
- 
     /* CHART */
     .chart-section { padding:20px 28px 4px; border-bottom:1px solid var(--c-border2); display:none; }
     .section-label { font-size:10px; text-transform:uppercase; letter-spacing:1.4px; color:var(--c-muted); font-weight:700; margin-bottom:14px; }
- 
     /* MONTHLY */
     .monthly-section { border-top:1px solid var(--c-border2); display:none; }
     .monthly-header { padding:16px 28px 0; display:flex; align-items:center; justify-content:space-between; }
@@ -106,7 +100,6 @@
     .month-meta { font-size:11px; color:var(--c-muted); }
     .toggle-btn { font-size:11px; font-family:'Syne',sans-serif; font-weight:700; color:var(--c-muted); background:none; border:none; cursor:pointer; padding:3px 6px; border-radius:5px; transition:color 0.15s; }
     .toggle-btn:hover { color:var(--c-text); }
- 
     .table-wrap { max-height:380px; overflow-y:auto; }
     .table-wrap::-webkit-scrollbar { width:4px; }
     .table-wrap::-webkit-scrollbar-thumb { background:rgba(245,200,66,0.18); border-radius:4px; }
@@ -120,23 +113,29 @@
     tbody tr { border-bottom:1px solid var(--c-border2); transition:background 0.1s; }
     tbody tr:last-child { border-bottom:none; }
     tbody tr:hover { background:rgba(255,255,255,0.025); }
-    @keyframes rowIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
+    tbody tr.has-note { cursor:pointer; }
+    @keyframes rowIn { from{opacity:0;transform:translateX(-8px);}to{opacity:1;transform:translateX(0);} }
     td { padding:13px 18px; font-size:13px; vertical-align:middle; }
     .td-date { font-family:'DM Mono',monospace; color:var(--c-muted); font-size:12px; }
     .td-stream { font-weight:700; font-size:13px; }
     .td-stream .dot { display:inline-block; width:6px; height:6px; background:var(--c-gold); border-radius:50%; margin-right:7px; vertical-align:middle; }
     .td-cashout { font-family:'DM Mono',monospace; font-weight:500; font-size:14px; }
+    .td-note { font-size:11px; color:var(--c-muted); font-family:'DM Mono',monospace; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .note-icon { display:inline-block; opacity:0.4; font-size:11px; }
     .badge { display:inline-flex; align-items:center; border-radius:999px; padding:3px 9px; font-size:11px; font-weight:700; }
     .badge.pos { background:rgba(61,219,130,0.1); border:1px solid rgba(61,219,130,0.2); color:var(--c-green); }
     .badge.neg { background:rgba(255,77,77,0.1); border:1px solid rgba(255,77,77,0.2); color:var(--c-red); }
     .del-btn { background:none; border:none; cursor:pointer; color:rgba(255,255,255,0.15); font-size:13px; padding:5px 9px; border-radius:7px; transition:color 0.15s, background 0.15s; }
     .del-btn:hover { color:var(--c-red); background:rgba(255,77,77,0.1); }
+    /* NOTE EXPAND ROW */
+    .note-row td { padding:0 18px 14px 44px; font-size:12px; font-family:'DM Mono',monospace; color:var(--c-muted); line-height:1.6; border-bottom:1px solid var(--c-border2); }
+    .note-row.hidden { display:none; }
     .empty-state { text-align:center; padding:52px 20px; color:var(--c-muted); }
     .empty-icon { font-size:32px; margin-bottom:12px; opacity:0.4; }
     .empty-state p { font-size:13px; opacity:0.7; }
     .loading-row td { text-align:center; padding:40px; }
     .spinner { display:inline-block; width:18px; height:18px; border:2px solid rgba(245,200,66,0.15); border-top-color:var(--c-gold); border-radius:50%; animation:spin 0.7s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
+    @keyframes spin { to{transform:rotate(360deg);} }
     .footer { display:flex; align-items:center; justify-content:space-between; padding:10px 20px; border-top:1px solid var(--c-border2); background:rgba(0,0,0,0.1); }
     .save-ind { font-size:11px; font-family:'DM Mono',monospace; color:var(--c-muted); transition:color 0.3s; }
     .save-ind.ok { color:var(--c-green); }
@@ -155,9 +154,9 @@
   </style>
 </head>
 <body>
- 
+
   <p class="page-title">Stream Sessions</p>
- 
+
   <div class="tracker">
     <div class="header">
       <div class="logo-area">
@@ -174,7 +173,7 @@
         <div class="pill pill-gold" id="total-pill">Net $0.00</div>
       </div>
     </div>
- 
+
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-label">Streams</div>
@@ -193,7 +192,7 @@
         <div class="stat-val" id="s-net" style="color:var(--c-gold)">$0.00</div>
       </div>
     </div>
- 
+
     <div class="form-section">
       <div class="field">
         <label>Date</label>
@@ -209,14 +208,20 @@
       </div>
       <button class="add-btn" id="add-btn" onclick="addEntry()">+ Add</button>
     </div>
- 
+    <div class="form-notes">
+      <div class="field">
+        <label>Notes <span style="opacity:0.4;font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea id="f-note" placeholder="What happened this stream? Big win, bad beat, new game..."></textarea>
+      </div>
+    </div>
+
     <!-- CHART SECTION -->
     <div class="chart-section" id="chart-section">
       <div class="section-label">Cashout Over Time</div>
       <canvas id="cashout-chart" height="110" style="width:100%;display:block;"></canvas>
       <div style="height:16px;"></div>
     </div>
- 
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -225,15 +230,16 @@
             <th>Stream</th>
             <th>Cashout</th>
             <th>Result</th>
+            <th>Note</th>
             <th style="text-align:center;width:48px"></th>
           </tr>
         </thead>
         <tbody id="entries-body">
-          <tr class="loading-row"><td colspan="5"><span class="spinner"></span></td></tr>
+          <tr class="loading-row"><td colspan="6"><span class="spinner"></span></td></tr>
         </tbody>
       </table>
     </div>
- 
+
     <!-- MONTHLY SECTION -->
     <div class="monthly-section" id="monthly-section">
       <div class="monthly-header">
@@ -242,13 +248,13 @@
       </div>
       <div class="monthly-grid" id="monthly-grid"></div>
     </div>
- 
+
     <div class="footer">
       <div class="save-ind" id="save-ind">Connecting…</div>
       <button class="clear-btn" onclick="clearAll()">Clear all</button>
     </div>
   </div>
- 
+
   <script>
     const SUPABASE_URL = 'YOUR_SUPABASE_URL';
     const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
@@ -259,11 +265,12 @@
       'Content-Type': 'application/json',
       'Prefer': 'return=representation'
     };
- 
+
     let entries = [];
     let chartVisible = false;
     let monthlyVisible = false;
- 
+    let expandedId = null;
+
     async function load() {
       try {
         const r = await fetch(API + '?order=date.desc,created_at.desc', { headers: H });
@@ -274,32 +281,36 @@
       } catch(e) {
         status('⚠ Connection failed — check Supabase config', true);
         document.getElementById('entries-body').innerHTML =
-          `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not connect to database.</p></div></td></tr>`;
+          `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not connect to database.</p></div></td></tr>`;
       }
     }
- 
+
     async function addEntry() {
-      const date = document.getElementById('f-date').value;
-      const nEl  = document.getElementById('f-name');
-      const cEl  = document.getElementById('f-cashout');
-      const name = nEl.value.trim();
+      const date    = document.getElementById('f-date').value;
+      const nEl     = document.getElementById('f-name');
+      const cEl     = document.getElementById('f-cashout');
+      const noteEl  = document.getElementById('f-note');
+      const name    = nEl.value.trim();
       const cashout = parseFloat(cEl.value);
-      const btn  = document.getElementById('add-btn');
- 
+      const note    = noteEl.value.trim();
+      const btn     = document.getElementById('add-btn');
+
       nEl.classList.remove('error'); cEl.classList.remove('error');
       if (!name)          { nEl.classList.add('error'); }
       if (isNaN(cashout)) { cEl.classList.add('error'); }
       if (!name || isNaN(cashout)) return;
- 
+
       btn.disabled = true; btn.textContent = '…';
       status('Saving…');
- 
+
       try {
-        const r = await fetch(API, { method:'POST', headers:H, body:JSON.stringify({date,name,cashout}) });
+        const payload = { date, name, cashout };
+        if (note) payload.note = note;
+        const r = await fetch(API, { method:'POST', headers:H, body:JSON.stringify(payload) });
         if (!r.ok) throw new Error(await r.text());
         const [row] = await r.json();
         entries.unshift(row);
-        nEl.value = ''; cEl.value = '';
+        nEl.value = ''; cEl.value = ''; noteEl.value = '';
         nEl.focus();
         render();
         status('✓ Saved · ' + new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), false, true);
@@ -309,7 +320,7 @@
         btn.disabled = false; btn.textContent = '+ Add';
       }
     }
- 
+
     async function removeEntry(id) {
       const prev = [...entries];
       entries = entries.filter(e => e.id !== id);
@@ -323,7 +334,7 @@
         status('⚠ Delete failed', true);
       }
     }
- 
+
     async function clearAll() {
       if (!entries.length) return;
       if (!confirm('Delete all ' + entries.length + ' session(s)? Cannot be undone.')) return;
@@ -335,7 +346,12 @@
         status('All sessions cleared');
       } catch(e) { status('⚠ Clear failed', true); }
     }
- 
+
+    function toggleNote(id) {
+      expandedId = expandedId === id ? null : id;
+      render();
+    }
+
     function status(msg, isErr, autoReset) {
       const el = document.getElementById('save-ind');
       el.textContent = msg;
@@ -345,17 +361,16 @@
         el.textContent = entries.length + ' session' + (entries.length !== 1 ? 's' : '') + ' stored';
       }, 2500);
     }
- 
+
     function fmt(n) { return (n >= 0 ? '+$' : '-$') + Math.abs(n).toFixed(2); }
     function fmtDate(d) {
       const [y,m,day] = d.split('-');
-      return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]
-        + ' ' + parseInt(day) + ', ' + y;
+      return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1] + ' ' + parseInt(day) + ', ' + y;
     }
     function esc(s) {
       return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
- 
+
     // ── CHART ──────────────────────────────────────────────
     function toggleChart() {
       chartVisible = !chartVisible;
@@ -365,7 +380,7 @@
       btn.classList.toggle('active', chartVisible);
       if (chartVisible) renderChart();
     }
- 
+
     function renderChart() {
       if (!chartVisible || entries.length < 2) return;
       const sorted = [...entries].sort((a,b) => a.date.localeCompare(b.date));
@@ -376,7 +391,7 @@
       const data = sorted.map(e => parseFloat(e.cashout));
       const canvas = document.getElementById('cashout-chart');
       const dpr = window.devicePixelRatio || 1;
-      canvas.width  = canvas.offsetWidth * dpr;
+      canvas.width = canvas.offsetWidth * dpr;
       canvas.height = 110 * dpr;
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
@@ -388,32 +403,28 @@
         x: pad.l + (i/(data.length-1))*(W-pad.l-pad.r),
         y: pad.t + (1-(v-min)/range)*(H-pad.t-pad.b)
       }));
-      // zero line
       if (min < 0 && max > 0) {
         const zy = pad.t + (1-(0-min)/range)*(H-pad.t-pad.b);
         ctx.save(); ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
         ctx.beginPath(); ctx.moveTo(pad.l,zy); ctx.lineTo(W-pad.r,zy); ctx.stroke(); ctx.restore();
       }
-      // gradient fill
       const grad = ctx.createLinearGradient(0,pad.t,0,H);
       grad.addColorStop(0,'rgba(245,200,66,0.15)'); grad.addColorStop(1,'rgba(245,200,66,0)');
       ctx.beginPath(); ctx.moveTo(pts[0].x,H-pad.b);
       pts.forEach(p=>ctx.lineTo(p.x,p.y));
       ctx.lineTo(pts[pts.length-1].x,H-pad.b); ctx.closePath();
       ctx.fillStyle=grad; ctx.fill();
-      // line
       ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
       pts.forEach(p=>ctx.lineTo(p.x,p.y));
       ctx.strokeStyle='#F5C842'; ctx.lineWidth=2; ctx.lineJoin='round'; ctx.stroke();
-      // dots + x-labels
-      ctx.font = `${9*dpr/dpr}px 'DM Mono',monospace`; ctx.textAlign='center';
+      ctx.font=`9px 'DM Mono',monospace`; ctx.textAlign='center';
       pts.forEach((p,i)=>{
         ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2);
-        ctx.fillStyle = data[i]>=0?'#3DDB82':'#FF4D4D'; ctx.fill();
+        ctx.fillStyle=data[i]>=0?'#3DDB82':'#FF4D4D'; ctx.fill();
         ctx.fillStyle='#7A7870'; ctx.fillText(labels[i],p.x,H-8);
       });
     }
- 
+
     // ── MONTHLY ────────────────────────────────────────────
     function toggleMonthly() {
       monthlyVisible = !monthlyVisible;
@@ -425,7 +436,7 @@
       if (tbtn) tbtn.textContent = monthlyVisible ? '▲ Hide' : '▼ Show';
       if (monthlyVisible) renderMonthly();
     }
- 
+
     function renderMonthly() {
       const grid = document.getElementById('monthly-grid');
       const months = {};
@@ -448,55 +459,60 @@
         </div>`;
       }).join('');
     }
- 
+
     // ── RENDER ─────────────────────────────────────────────
     function render() {
       const vals = entries.map(e => parseFloat(e.cashout));
       const net  = vals.reduce((a,b)=>a+b,0);
       const best = vals.length ? Math.max(...vals) : null;
       const worst = vals.length ? Math.min(...vals) : null;
- 
+
       document.getElementById('s-count').textContent = entries.length;
       document.getElementById('s-net').textContent   = fmt(net);
       document.getElementById('s-net').style.color   = net>=0?'var(--c-green)':'var(--c-red)';
       document.getElementById('s-best').textContent  = best  !==null ? fmt(best)  : '—';
       document.getElementById('s-worst').textContent = worst !==null ? fmt(worst) : '—';
       document.getElementById('total-pill').textContent = 'Net ' + fmt(net);
- 
-      // show/hide feature buttons
-      const hasData = entries.length >= 2;
+
       document.getElementById('btn-chart').style.display   = entries.length>=2 ? '' : 'none';
       document.getElementById('btn-monthly').style.display = entries.length>=1 ? '' : 'none';
- 
+
       const body = document.getElementById('entries-body');
       if (!entries.length) {
-        body.innerHTML = `<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">🎰</div><p>No streams logged yet — add your first session above.</p></div></td></tr>`;
+        body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🎰</div><p>No streams logged yet — add your first session above.</p></div></td></tr>`;
         return;
       }
+
       body.innerHTML = entries.map(e => {
         const v = parseFloat(e.cashout), pos = v>=0;
-        return `<tr style="animation:rowIn 0.25s ease both">
+        const hasNote = e.note && e.note.trim();
+        const isExpanded = expandedId === e.id;
+        const notePreview = hasNote
+          ? `<span class="note-icon">📝</span> <span style="opacity:0.6">${esc(e.note.slice(0,30))}${e.note.length>30?'…':''}</span>`
+          : `<span style="opacity:0.2">—</span>`;
+        return `<tr style="animation:rowIn 0.25s ease both" ${hasNote?`onclick="toggleNote('${e.id}')" class="has-note"`:''}>
           <td class="td-date">${fmtDate(e.date)}</td>
           <td class="td-stream"><span class="dot"></span>${esc(e.name)}</td>
           <td class="td-cashout" style="color:${pos?'var(--c-green)':'var(--c-red)'}">${fmt(v)}</td>
           <td><span class="badge ${pos?'pos':'neg'}">${pos?'▲ profit':'▼ loss'}</span></td>
-          <td style="text-align:center"><button class="del-btn" onclick="removeEntry('${e.id}')">✕</button></td>
-        </tr>`;
+          <td class="td-note">${notePreview}</td>
+          <td style="text-align:center"><button class="del-btn" onclick="event.stopPropagation();removeEntry('${e.id}')">✕</button></td>
+        </tr>${hasNote && isExpanded ? `<tr class="note-row"><td colspan="6">📝 ${esc(e.note)}</td></tr>` : ''}`;
       }).join('');
- 
+
       if (chartVisible) renderChart();
       if (monthlyVisible) renderMonthly();
     }
- 
+
     function exportCSV() {
       if (!entries.length) return;
-      const rows = [['Date','Stream','Cashout','Result'],
-        ...entries.map(e=>[e.date,'"'+String(e.name).replace(/"/g,'""')+'"',parseFloat(e.cashout).toFixed(2),parseFloat(e.cashout)>=0?'profit':'loss'])];
+      const rows = [['Date','Stream','Cashout','Result','Note'],
+        ...entries.map(e=>[e.date,'"'+String(e.name).replace(/"/g,'""')+'"',parseFloat(e.cashout).toFixed(2),parseFloat(e.cashout)>=0?'profit':'loss','"'+(e.note||'').replace(/"/g,'""')+'"'])];
       const blob = new Blob([rows.map(r=>r.join(',')).join('\r\n')],{type:'text/csv;charset=utf-8;'});
       const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'chips-gg-'+new Date().toISOString().slice(0,10)+'.csv'});
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
- 
+
     ['f-name','f-cashout'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>e.key==='Enter'&&addEntry()));
     document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
     load();
