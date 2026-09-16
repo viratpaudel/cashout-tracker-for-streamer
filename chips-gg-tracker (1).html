@@ -50,7 +50,7 @@
     .header-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .pill { border-radius:999px; padding:6px 14px; font-family:'DM Mono',monospace; font-size:13px; font-weight:500; white-space:nowrap; }
     .pill-gold { background:rgba(245,200,66,0.1); border:1px solid rgba(245,200,66,0.25); color:var(--c-gold); }
-    .pill-ghost { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); color:var(--c-muted); cursor:pointer; font-family:'Syne',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.5px; transition:all 0.15s; }
+    .pill-ghost { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09); color:var(--c-muted); cursor:pointer; font-family:'Syne',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.3px; }
     .pill-ghost:hover { color:var(--c-text); border-color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); }
     .pill-ghost.active { color:var(--c-gold); border-color:rgba(245,200,66,0.3); background:rgba(245,200,66,0.07); }
     .stats-row { display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--c-border2); }
@@ -120,6 +120,7 @@
     .td-stream { font-weight:700; font-size:13px; }
     .td-stream .dot { display:inline-block; width:6px; height:6px; background:var(--c-gold); border-radius:50%; margin-right:7px; vertical-align:middle; }
     .td-cashout { font-family:'DM Mono',monospace; font-weight:500; font-size:14px; }
+    .td-balance { font-family:'DM Mono',monospace; font-weight:500; font-size:13px; }
     .td-note { font-size:11px; color:var(--c-muted); font-family:'DM Mono',monospace; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .note-icon { display:inline-block; opacity:0.4; font-size:11px; }
     .badge { display:inline-flex; align-items:center; border-radius:999px; padding:3px 9px; font-size:11px; font-weight:700; }
@@ -188,8 +189,8 @@
         <div class="stat-val" id="s-worst" style="color:var(--c-red)">—</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Net Cashout</div>
-        <div class="stat-val" id="s-net" style="color:var(--c-gold)">$0.00</div>
+        <div class="stat-label">Average</div>
+        <div class="stat-val" id="s-avg" style="color:var(--c-gold)">—</div>
       </div>
     </div>
 
@@ -229,13 +230,14 @@
             <th>Date</th>
             <th>Stream</th>
             <th>Cashout</th>
+            <th>Balance</th>
             <th>Result</th>
             <th>Note</th>
             <th style="text-align:center;width:48px"></th>
           </tr>
         </thead>
         <tbody id="entries-body">
-          <tr class="loading-row"><td colspan="6"><span class="spinner"></span></td></tr>
+          <tr class="loading-row"><td colspan="7"><span class="spinner"></span></td></tr>
         </tbody>
       </table>
     </div>
@@ -281,7 +283,7 @@
       } catch(e) {
         status('⚠ Connection failed — check Supabase config', true);
         document.getElementById('entries-body').innerHTML =
-          `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not connect to database.</p></div></td></tr>`;
+          `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not connect to database.</p></div></td></tr>`;
       }
     }
 
@@ -466,12 +468,15 @@
       const net  = vals.reduce((a,b)=>a+b,0);
       const best = vals.length ? Math.max(...vals) : null;
       const worst = vals.length ? Math.min(...vals) : null;
+      const avg = vals.length ? net / vals.length : null;
 
       document.getElementById('s-count').textContent = entries.length;
       document.getElementById('s-net').textContent   = fmt(net);
       document.getElementById('s-net').style.color   = net>=0?'var(--c-green)':'var(--c-red)';
       document.getElementById('s-best').textContent  = best  !==null ? fmt(best)  : '—';
       document.getElementById('s-worst').textContent = worst !==null ? fmt(worst) : '—';
+      document.getElementById('s-avg').textContent   = avg  !==null ? fmt(avg)  : '—';
+      document.getElementById('s-avg').style.color   = avg>=0?'var(--c-green)':'var(--c-red)';
       document.getElementById('total-pill').textContent = 'Net ' + fmt(net);
 
       document.getElementById('btn-chart').style.display   = entries.length>=2 ? '' : 'none';
@@ -479,25 +484,30 @@
 
       const body = document.getElementById('entries-body');
       if (!entries.length) {
-        body.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">🎰</div><p>No streams logged yet — add your first session above.</p></div></td></tr>`;
+        body.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">🎰</div><p>No streams logged yet — add your first session above.</p></div></td></tr>`;
         return;
       }
 
-      body.innerHTML = entries.map(e => {
+      // Calculate running balance
+      let balance = 0;
+      body.innerHTML = entries.map((e, idx) => {
         const v = parseFloat(e.cashout), pos = v>=0;
+        balance += v;
         const hasNote = e.note && e.note.trim();
         const isExpanded = expandedId === e.id;
         const notePreview = hasNote
           ? `<span class="note-icon">📝</span> <span style="opacity:0.6">${esc(e.note.slice(0,30))}${e.note.length>30?'…':''}</span>`
           : `<span style="opacity:0.2">—</span>`;
+        const balanceColor = balance>=0?'var(--c-green)':'var(--c-red)';
         return `<tr style="animation:rowIn 0.25s ease both" ${hasNote?`onclick="toggleNote('${e.id}')" class="has-note"`:''}>
           <td class="td-date">${fmtDate(e.date)}</td>
           <td class="td-stream"><span class="dot"></span>${esc(e.name)}</td>
           <td class="td-cashout" style="color:${pos?'var(--c-green)':'var(--c-red)'}">${fmt(v)}</td>
+          <td class="td-balance" style="color:${balanceColor}">${fmt(balance)}</td>
           <td><span class="badge ${pos?'pos':'neg'}">${pos?'▲ profit':'▼ loss'}</span></td>
           <td class="td-note">${notePreview}</td>
           <td style="text-align:center"><button class="del-btn" onclick="event.stopPropagation();removeEntry('${e.id}')">✕</button></td>
-        </tr>${hasNote && isExpanded ? `<tr class="note-row"><td colspan="6">📝 ${esc(e.note)}</td></tr>` : ''}`;
+        </tr>${hasNote && isExpanded ? `<tr class="note-row"><td colspan="7">📝 ${esc(e.note)}</td></tr>` : ''}`;
       }).join('');
 
       if (chartVisible) renderChart();
@@ -506,8 +516,12 @@
 
     function exportCSV() {
       if (!entries.length) return;
-      const rows = [['Date','Stream','Cashout','Result','Note'],
-        ...entries.map(e=>[e.date,'"'+String(e.name).replace(/"/g,'""')+'"',parseFloat(e.cashout).toFixed(2),parseFloat(e.cashout)>=0?'profit':'loss','"'+(e.note||'').replace(/"/g,'""')+'"'])];
+      let balance = 0;
+      const rows = [['Date','Stream','Cashout','Balance','Result','Note'],
+        ...entries.map(e=>{
+          balance += parseFloat(e.cashout);
+          return [e.date,'"'+String(e.name).replace(/"/g,'""')+'"',parseFloat(e.cashout).toFixed(2),balance.toFixed(2),parseFloat(e.cashout)>=0?'profit':'loss','"'+(e.note||'').replace(/"/g,'""')+'"'];
+        })];
       const blob = new Blob([rows.map(r=>r.join(',')).join('\r\n')],{type:'text/csv;charset=utf-8;'});
       const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'chips-gg-'+new Date().toISOString().slice(0,10)+'.csv'});
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
